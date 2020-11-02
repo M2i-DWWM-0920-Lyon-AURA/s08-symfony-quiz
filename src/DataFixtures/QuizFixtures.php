@@ -3,19 +3,55 @@
 namespace App\DataFixtures;
 
 use App\Entity\Quiz;
+use App\Entity\User;
 use App\Entity\Answer;
+use App\Entity\Player;
 use App\Entity\Question;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class QuizFixtures extends Fixture
 {
-    protected function makeQuiz(string $title, string $description): Quiz
+    private $passwordEncoder;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
+    protected function makeUser(string $email, string $password): User
+    {
+        $user = new User();
+        $user
+            ->setEmail($email)
+            ->setPassword($this->passwordEncoder->encodePassword(
+                $user,
+                $password
+            ))
+        ;
+
+        return $user;
+    }
+
+    protected function makePlayer(string $name, User $user): Player
+    {
+        $player = new Player();
+        $player
+            ->setName($name)
+            ->setUser($user)
+        ;
+
+        return $player;
+    }
+
+    protected function makeQuiz(string $title, string $description, Player $player): Quiz
     {
         $quiz = new Quiz();
         $quiz
             ->setTitle($title)
             ->setDescription($description)
+            ->setAuthor($player)
         ;
 
         return $quiz;
@@ -47,10 +83,22 @@ class QuizFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
+        // Crée des nouveaux utilisateurs
+        $users = [
+            $this->makeUser('jeanpierre@test.com', 'jeanpierre'),
+            $this->makeUser('madeleine@test.com', 'madeleine'),
+        ];
+
+        // Crée les profils des joueurs
+        $players = [
+            $this->makePlayer('JP le bg du 69', $users[0]),
+            $this->makePlayer('Madodo73', $users[1]),
+        ];
+
         // Crée les quiz
         $quizzes = [
-            $this->makeQuiz('Divers faits étonnants', 'Etonnez-vous avec ces petites choses de la vie quotidienne que vous ignorez probablement!'),
-            $this->makeQuiz('The Big Bang Theory', 'Êtes-vous un vrai fan de The Big Bang Theory? Pour le savoir, un seul moyen: répondez à ce quiz ultime sur la série!'),
+            $this->makeQuiz('Divers faits étonnants', 'Etonnez-vous avec ces petites choses de la vie quotidienne que vous ignorez probablement!', $players[0]),
+            $this->makeQuiz('The Big Bang Theory', 'Êtes-vous un vrai fan de The Big Bang Theory? Pour le savoir, un seul moyen: répondez à ce quiz ultime sur la série!', $players[1]),
         ];
 
         // Crée les questions
@@ -111,7 +159,7 @@ class QuizFixtures extends Fixture
         ];
 
         // Marque tous les objets créés comme prêts à être envoyés en base de données
-        foreach (\array_merge($quizzes, $questions, $answers) as $object) {
+        foreach (\array_merge($users, $players, $quizzes, $questions, $answers) as $object) {
             $manager->persist($object);
         }
 

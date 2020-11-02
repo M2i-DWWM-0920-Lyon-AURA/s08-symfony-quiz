@@ -24,13 +24,13 @@ class Score
 
     /**
      * @ORM\ManyToOne(targetEntity=Player::class, inversedBy="scores")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $player;
 
     /**
      * @ORM\ManyToOne(targetEntity=Quiz::class, inversedBy="scores")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $quiz;
 
