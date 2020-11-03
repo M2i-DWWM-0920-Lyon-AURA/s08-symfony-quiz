@@ -50,12 +50,12 @@ class Answer
         return $this;
     }
 
-    public function getRank(): ?int
+    public function get_rank(): ?int
     {
         return $this->_rank;
     }
 
-    public function setRank(int $_rank): self
+    public function set_rank(int $_rank): self
     {
         $this->_rank = $_rank;
 
