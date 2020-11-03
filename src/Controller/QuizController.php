@@ -12,6 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+/**
+ * @Route("/quiz", name="quiz_")
+ */
 class QuizController extends AbstractController
 {
     protected QuizRepository $repository;
@@ -24,7 +27,7 @@ class QuizController extends AbstractController
     /**
      * Display a list of quizzes available to play
      * 
-     * @Route("/quiz", name="quiz_list")
+     * @Route("", name="list")
      */
     public function list(): Response
     {
@@ -40,7 +43,7 @@ class QuizController extends AbstractController
     /**
      * Display details of a single quiz
      * 
-     * @Route("/quiz/{id}", name="quiz_single", requirements={"id"="\d+"})
+     * @Route("/{id}", name="single", requirements={"id"="\d+"})
      */
     public function single(int $id, QuestionRepository $questionRepository): Response
     {
@@ -70,7 +73,7 @@ class QuizController extends AbstractController
     /**
      * Display quiz result
      * 
-     * @Route("quiz/{id}/result", name="quiz_result", requirements={"id"="\d+"})
+     * @Route("/{id}/result", name="result", requirements={"id"="\d+"})
      */
     public function result(int $id, SessionInterface $session, EntityManagerInterface $manager, ScoreRepository $scoreRepository)
     {
