@@ -3,8 +3,6 @@
 {% block title %}Quiz - {{ quiz.title }}{% endblock %}
 
 {% block main %}
-<h1>{{ quiz.title }}</h1>
-<p class="card-text"><small class="text-muted">Quiz créé par <a href="/player/{{ quiz.author.id }}">{{ quiz.author.name }}</a></small></p>
-<p>{{ quiz.description }}</p>
-<a href="/question/{{ first_question.id }}" class="btn btn-primary">Jouer</a>
+    {% include 'quiz/details.html.twig' %}
+    <a href="/question/{{ first_question.id }}" class="btn btn-primary">Jouer</a>
 {% endblock %}

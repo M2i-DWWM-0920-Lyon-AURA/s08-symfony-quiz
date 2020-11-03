@@ -5,10 +5,12 @@
 {% block main %}
 <h1>Profil du joueur {{ player.name }}</h1>
 <h2>Quiz créés par ce joueur</h2>
-<ul>
+<ul class="list-unstyled">
 
     {% for quiz in player.quizzes %}
-    <li>{{ quiz.title }}</li>
+        <li>
+            {% include 'quiz/preview.html.twig' %}
+        </li>
     {% endfor %}
 
 </ul>

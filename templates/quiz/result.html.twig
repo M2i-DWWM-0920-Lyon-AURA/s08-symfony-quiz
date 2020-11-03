@@ -3,20 +3,18 @@
 {% block title %}Quiz - Résultat{% endblock %}
 
 {% block main %}
-{# read and display all flash messages #}
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ label }} alert-dismissible fade show">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+    {# read and display all flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
     {% endfor %}
-{% endfor %}
 
-<h1>{{ quiz.title }}</h1>
-<p class="card-text"><small class="text-muted">Quiz créé par {{ quiz.author.name }}</small></p>
-<p>{{ quiz.description }}</p>
-<p>Bravo! Vous avez atteint le score extraordinaire de {{ score }} sur {{ questionCount }}.</p>
+    {% include 'quiz/details.html.twig' %}
+    <p>Bravo! Vous avez atteint le score extraordinaire de {{ score }} sur {{ questionCount }}.</p>
 {% endblock %}
