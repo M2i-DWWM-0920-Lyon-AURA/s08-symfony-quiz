@@ -14,15 +14,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class QuizController extends AbstractController
 {
+    protected QuizRepository $repository;
+
+    public function __construct(QuizRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     /**
      * Display a list of quizzes available to play
      * 
      * @Route("/quiz", name="quiz_list")
      */
-    public function list(QuizRepository $repository): Response
+    public function list(): Response
     {
         // Récupère tous les quiz
-        $quizzes = $repository->findAll();
+        $quizzes = $this->repository->findAll();
 
         // Renvoie une vue affichant une liste des quiz
         return $this->render('quiz/list.html.twig', [
@@ -35,10 +42,10 @@ class QuizController extends AbstractController
      * 
      * @Route("/quiz/{id}", name="quiz_single", requirements={"id"="\d+"})
      */
-    public function single(int $id, QuizRepository $repository, QuestionRepository $questionRepository): Response
+    public function single(int $id, QuestionRepository $questionRepository): Response
     {
         // Récupère le quiz concerné
-        $quiz = $repository->find($id);
+        $quiz = $this->repository->find($id);
 
         // Si le quiz n'existe pas, renvoie une erreur 404
         if (is_null($quiz)) {
@@ -65,13 +72,13 @@ class QuizController extends AbstractController
      * 
      * @Route("quiz/{id}/result", name="quiz_result", requirements={"id"="\d+"})
      */
-    public function result(int $id, QuizRepository $repository, SessionInterface $session, EntityManagerInterface $manager, ScoreRepository $scoreRepository)
+    public function result(int $id, SessionInterface $session, EntityManagerInterface $manager, ScoreRepository $scoreRepository)
     {
         // Récupère l'utilisateur actuellement connecté
         $currentUser = $this->getUser();
 
         // Récupère le quiz concerné
-        $quiz = $repository->find($id);
+        $quiz = $this->repository->find($id);
 
         // Si le quiz n'existe pas, renvoie une erreur 404
         if (is_null($quiz)) {
