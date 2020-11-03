@@ -20,4 +20,20 @@ class QuizController extends AbstractController
             'quizzes' => $quizzes,
         ]);
     }
+
+    /**
+     * @Route("/quiz/{id}", name="quiz_single", requirements={"id"="\d+"})
+     */
+    public function single(int $id, QuizRepository $repository): Response
+    {
+        $quiz = $repository->find($id);
+
+        if (is_null($quiz)) {
+            throw $this->createNotFoundException('Quiz #' . $id . ' does not exist.');
+        }
+
+        return $this->render('quiz/single.html.twig', [
+            'quiz' => $quiz
+        ]);
+    }
 }

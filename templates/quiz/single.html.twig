@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quiz - {{ quiz.title }}{% endblock %}
+
+{% block main %}
+<h1>{{ quiz.title }}</h1>
+<p class="card-text"><small class="text-muted">Quiz créé par {{ quiz.author.name }}</small></p>
+<p>{{ quiz.description }}</p>
+<a href="" class="btn btn-primary">Jouer</a>
+{% endblock %}
