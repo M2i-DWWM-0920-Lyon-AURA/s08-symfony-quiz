@@ -6,14 +6,17 @@ use App\Repository\QuestionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class QuestionController extends AbstractController
 {
     /**
+     * Display a single question for the user to answer
+     * 
      * @Route("/question/{id}", name="question_single", requirements={"id"="\d+"})
      */
-    public function single(int $id, QuestionRepository $repository): Response
+    public function single(int $id, QuestionRepository $repository, SessionInterface $session): Response
     {
         // Récupère la question concernée
         $question = $repository->find($id);
@@ -23,6 +26,11 @@ class QuestionController extends AbstractController
             throw $this->createNotFoundException('Question #' . $id . ' does not exist.');
         }
 
+        // Si on a atteint la première question d'un quiz, initialiser le score à zéro
+        if ($question->get_rank() === 1) {
+            $session->set('score', 0);
+        }
+
         // Renvoie une vue affichant la question concernée
         return $this->render('question/single.html.twig', [
             'question' => $question,
@@ -30,9 +38,11 @@ class QuestionController extends AbstractController
     }
 
     /**
+     * Process answer given by user to previous question
+     * 
      * @Route("/question/{id}/give-answer", name="question_give-answer", requirements={"id"="\d+"}, methods={"POST"})
      */
-    public function giveAnswer(int $id, Request $request, QuestionRepository $repository)
+    public function giveAnswer(int $id, Request $request, QuestionRepository $repository, SessionInterface $session)
     {
         // Récupère la question concernée
         $question = $repository->find($id);
@@ -48,7 +58,9 @@ class QuestionController extends AbstractController
 
         // Si la réponse donnée par l'utilisateur est juste
         if ($question->getRightAnswer()->getId() === $userAnswer) {
-            // TODO: Augment le score de 1
+            // TODO: Augmente le score de 1
+            $score = $session->get('score');
+            $session->set('score', $score + 1);
 
             // Ajoute un message à afficher sur la prochaine page
             $this->addFlash(
@@ -72,7 +84,10 @@ class QuestionController extends AbstractController
             '_rank' => $question->get_rank() + 1
         ]);
 
-        // TODO: Redirige sur la page résultat si la question suivante n'existe pas
+        // Redirige sur la page résultat si la question suivante n'existe pas
+        if (is_null($nextQuestion)) {
+            return $this->redirectToRoute('quiz_result', ['id' => $question->getQuiz()->getId()]);
+        }
 
         // Redirige sur la page de la question suivante
         return $this->redirectToRoute('question_single', [
