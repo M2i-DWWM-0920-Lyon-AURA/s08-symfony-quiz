@@ -32,9 +32,18 @@
                     </ul>
 
                     <div>
-                        <a class="btn btn-primary" href="/login">
-                            Se connecter
-                        </a>
+                        {% if app.user %}
+                            <div class="navbar-text">
+                                Bienvenue, {{ app.user.player.name }}!
+                            </div>
+                            <a class="btn btn-secondary" href="/logout">
+                                Se déconnecter
+                            </a>
+                        {% else %}
+                            <a class="btn btn-primary" href="/login">
+                                Se connecter
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </nav>
