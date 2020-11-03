@@ -78,33 +78,50 @@ class QuizController extends AbstractController
             throw $this->createNotFoundException('Quiz #' . $id . ' does not exist.');
         }
 
-        // Récupère le score de l'utilisateur
+        // Récupère le score de l'utilisateur et le remet à zéro
         $score = $session->get('score');
+        $session->set('score', 0);
 
-        // Tente de récupérer le score précédent du joueur au quiz
-        $scoreObject = $scoreRepository->findOneBy([
-            'quiz' => $quiz,
-            'player' => $currentUser->getPlayer()
-        ]);
-        // Si le joueur n'a pas encore joué à ce quiz
-        if (is_null($scoreObject)) {
-            // Crée un nouveau score à envoyer en BDD
-            $scoreObject = new Score();
-            $scoreObject
-                ->setValue($score)
-                ->setQuiz($quiz)
-                ->setPlayer($currentUser->getPlayer())
-            ;
+        // Si l'utilisateur est bien connecté
+        if (!is_null($currentUser)) {
+            // Tente de récupérer le score précédent du joueur au quiz
+            $scoreObject = $scoreRepository->findOneBy([
+                'quiz' => $quiz,
+                'player' => $currentUser->getPlayer()
+            ]);
+            // Si le joueur n'a pas encore joué à ce quiz
+            if (is_null($scoreObject)) {
+                // Crée un nouveau score à envoyer en BDD
+                $scoreObject = new Score();
+                $scoreObject
+                    ->setValue($score)
+                    ->setQuiz($quiz)
+                    ->setPlayer($currentUser->getPlayer())
+                ;
+            // Sinon
+            } else {
+                // Met le score précédent à jour
+                $scoreObject
+                    ->setValue($score)
+                ;
+            }
+            // Envoie le score en BDD
+            $manager->persist($scoreObject);
+            $manager->flush();
+
+            // Ajoute un message à afficher sur la page
+            $this->addFlash(
+                'info',
+                'Votre score a été enregistré!'
+            );
         // Sinon
         } else {
-            // Met le score précédent à jour
-            $scoreObject
-                ->setValue($score)
-            ;
+            // Ajoute un message à afficher sur la page
+            $this->addFlash(
+                'warning',
+                'Votre score n\'a pas été enregistré... Connectez-vous pour profiter pleinement de notre super application!'
+            );
         }
-        // Envoie le score en BDD
-        $manager->persist($scoreObject);
-        $manager->flush();
 
         // Renvoie une vue affichant le résultat au quiz concerné
         return $this->render('quiz/result.html.twig', [
