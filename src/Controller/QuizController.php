@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Quiz;
 use App\Entity\Score;
 use App\Repository\QuizRepository;
 use App\Repository\ScoreRepository;
@@ -45,16 +46,8 @@ class QuizController extends AbstractController
      * 
      * @Route("/{id}", name="single", requirements={"id"="\d+"})
      */
-    public function single(int $id, QuestionRepository $questionRepository): Response
+    public function single(Quiz $quiz, QuestionRepository $questionRepository): Response
     {
-        // Récupère le quiz concerné
-        $quiz = $this->repository->find($id);
-
-        // Si le quiz n'existe pas, renvoie une erreur 404
-        if (is_null($quiz)) {
-            throw $this->createNotFoundException('Quiz #' . $id . ' does not exist.');
-        }
-
         // Récupère la première question du quiz, c'est-à-dire...
         $firstQuestion = $questionRepository->findOneBy([
             // ...appartenant au quiz...
@@ -75,18 +68,10 @@ class QuizController extends AbstractController
      * 
      * @Route("/{id}/result", name="result", requirements={"id"="\d+"})
      */
-    public function result(int $id, SessionInterface $session, EntityManagerInterface $manager, ScoreRepository $scoreRepository)
+    public function result(Quiz $quiz, SessionInterface $session, EntityManagerInterface $manager, ScoreRepository $scoreRepository)
     {
         // Récupère l'utilisateur actuellement connecté
         $currentUser = $this->getUser();
-
-        // Récupère le quiz concerné
-        $quiz = $this->repository->find($id);
-
-        // Si le quiz n'existe pas, renvoie une erreur 404
-        if (is_null($quiz)) {
-            throw $this->createNotFoundException('Quiz #' . $id . ' does not exist.');
-        }
 
         // Récupère le score de l'utilisateur et le remet à zéro
         $score = $session->get('score');
