@@ -62,7 +62,7 @@ class QuizFixtures extends Fixture
         $question = new Question();
         $question
             ->setDescription($description)
-            ->setRank($rank)
+            ->set_rank($rank)
             ->setQuiz($quiz)
         ;
 
@@ -74,7 +74,7 @@ class QuizFixtures extends Fixture
         $answer = new Answer();
         $answer
             ->setDescription($description)
-            ->setRank($rank)
+            ->set_rank($rank)
             ->setQuestion($question)
         ;
  
