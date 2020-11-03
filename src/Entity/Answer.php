@@ -25,7 +25,7 @@ class Answer
     /**
      * @ORM\Column(type="integer")
      */
-    private $rank;
+    private $_rank;
 
     /**
      * @ORM\ManyToOne(targetEntity=Question::class, inversedBy="answers")
@@ -52,12 +52,12 @@ class Answer
 
     public function getRank(): ?int
     {
-        return $this->rank;
+        return $this->_rank;
     }
 
-    public function setRank(int $rank): self
+    public function setRank(int $_rank): self
     {
-        $this->rank = $rank;
+        $this->_rank = $_rank;
 
         return $this;
     }
