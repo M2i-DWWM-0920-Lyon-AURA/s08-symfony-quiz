@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Player - {{ player.name }}{% endblock %}
+
+{% block main %}
+<h1>Profil du joueur {{ player.name }}</h1>
+<h2>Quiz créés par ce joueur</h2>
+<ul>
+
+    {% for quiz in player.quizzes %}
+    <li>{{ quiz.title }}</li>
+    {% endfor %}
+
+</ul>
+{% endblock %}
