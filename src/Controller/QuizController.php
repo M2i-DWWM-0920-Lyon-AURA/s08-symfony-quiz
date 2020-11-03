@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Score;
 use App\Repository\QuizRepository;
+use App\Repository\ScoreRepository;
 use App\Repository\QuestionRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -62,8 +65,11 @@ class QuizController extends AbstractController
      * 
      * @Route("quiz/{id}/result", name="quiz_result", requirements={"id"="\d+"})
      */
-    public function result(int $id, QuizRepository $repository, SessionInterface $session)
+    public function result(int $id, QuizRepository $repository, SessionInterface $session, EntityManagerInterface $manager, ScoreRepository $scoreRepository)
     {
+        // Récupère l'utilisateur actuellement connecté
+        $currentUser = $this->getUser();
+
         // Récupère le quiz concerné
         $quiz = $repository->find($id);
 
@@ -72,10 +78,38 @@ class QuizController extends AbstractController
             throw $this->createNotFoundException('Quiz #' . $id . ' does not exist.');
         }
 
+        // Récupère le score de l'utilisateur
+        $score = $session->get('score');
+
+        // Tente de récupérer le score précédent du joueur au quiz
+        $scoreObject = $scoreRepository->findOneBy([
+            'quiz' => $quiz,
+            'player' => $currentUser->getPlayer()
+        ]);
+        // Si le joueur n'a pas encore joué à ce quiz
+        if (is_null($scoreObject)) {
+            // Crée un nouveau score à envoyer en BDD
+            $scoreObject = new Score();
+            $scoreObject
+                ->setValue($score)
+                ->setQuiz($quiz)
+                ->setPlayer($currentUser->getPlayer())
+            ;
+        // Sinon
+        } else {
+            // Met le score précédent à jour
+            $scoreObject
+                ->setValue($score)
+            ;
+        }
+        // Envoie le score en BDD
+        $manager->persist($scoreObject);
+        $manager->flush();
+
         // Renvoie une vue affichant le résultat au quiz concerné
         return $this->render('quiz/result.html.twig', [
             'quiz' => $quiz,
-            'score' => $session->get('score'),
+            'score' => $score,
             'questionCount' => count($quiz->getQuestions())
         ]);
     }
