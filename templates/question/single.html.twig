@@ -3,6 +3,31 @@
 {% block title %}Hello QuestionController!{% endblock %}
 
 {% block main %}
+{# read and display all flash messages #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
 <h1>Question n°<span>{{ question._rank }}</span></h1>
 <p class="lead">{{ question.description }}</p>
+
+<form method="post" action="/question/{{ question.id }}/give-answer">
+
+    {% for answer in question.answers %}
+        <div class="custom-control custom-radio mb-2">
+            <input class="custom-control-input" type="radio" name="answer" id="answer{{ answer.id }}" value="{{ answer.id }}">
+            <label class="custom-control-label" for="answer{{ answer.id }}">{{ answer.description }}</label>
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Valider</button>
+
+</form>
 {% endblock %}

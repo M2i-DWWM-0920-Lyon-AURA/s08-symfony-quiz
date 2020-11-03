@@ -13,6 +13,7 @@ class MainController extends AbstractController
      */
     public function home(): Response
     {
+        // Renvoie une vue affichant la page d'accueil
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
         ]);
