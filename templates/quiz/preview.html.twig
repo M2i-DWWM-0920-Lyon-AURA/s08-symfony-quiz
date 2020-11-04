@@ -2,6 +2,6 @@
     <h5 class="card-header">{{ quiz.title }}</h5>
     <div class="card-body">
         <p class="card-text">{{ quiz.description }}</p>
-        <a href="/quiz/{{ quiz.id }}" class="btn btn-outline-primary">Voir plus</a>
+        <a href="{{ path('quiz_single', {id: quiz.id}) }}" class="btn btn-outline-primary">Voir plus</a>
     </div>
 </div>

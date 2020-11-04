@@ -4,5 +4,5 @@
 
 {% block main %}
     {% include 'quiz/details.html.twig' %}
-    <a href="/question/{{ first_question.id }}" class="btn btn-primary">Jouer</a>
+    <a href="{{ path('question_single', {id: first_question.id}) }}" class="btn btn-primary">Jouer</a>
 {% endblock %}
