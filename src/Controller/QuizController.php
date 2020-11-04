@@ -9,6 +9,7 @@ use App\Repository\QuizRepository;
 use App\Repository\ScoreRepository;
 use App\Repository\QuestionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -147,8 +148,23 @@ class QuizController extends AbstractController
     /**
      * @Route("/new", name="new", methods={"POST"})
      */
-    public function new()
+    public function new(Request $request, EntityManagerInterface $manager)
     {
+        $quiz = new Quiz();
 
+        $form = $this->createForm(QuizType::class, $quiz);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $quiz = $form->getData();
+            $quiz
+                ->setAuthor($this->getUser()->getPlayer())
+            ;
+        
+            $manager->persist($quiz);
+            $manager->flush();
+        }
+
+        return $this->redirectToRoute('create');
     }
 }
