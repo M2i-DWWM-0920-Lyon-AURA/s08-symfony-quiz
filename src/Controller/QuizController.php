@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Quiz;
 use App\Entity\Score;
+use App\Form\QuizType;
 use App\Repository\QuizRepository;
 use App\Repository\ScoreRepository;
 use App\Repository\QuestionRepository;
@@ -124,5 +125,30 @@ class QuizController extends AbstractController
             'score' => $score,
             'questionCount' => count($quiz->getQuestions())
         ]);
+    }
+
+    /**
+     * @Route("/new", name="new_form", methods={"GET"})
+     */
+    public function newForm()
+    {
+        // Crée un nouveau quiz à injecter dans le formulaire
+        $quiz = new Quiz();
+
+        // Crée un nouvel objet permettant de paramétrer le formulaire
+        $form = $this->createForm(QuizType::class, $quiz);
+
+        // Renvoie une nouvelle vue contenant le formulaire
+        return $this->render('quiz/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/new", name="new", methods={"POST"})
+     */
+    public function new()
+    {
+
     }
 }
