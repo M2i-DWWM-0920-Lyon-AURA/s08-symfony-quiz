@@ -191,6 +191,10 @@ class QuizController extends AbstractController
      */
     public function updateForm(Quiz $quiz)
     {
+        // Appelle le Voter pour déterminer si l'utilisateur actuellement connecté
+        // a le droit de modifier le quiz concerné
+        $this->denyAccessUnlessGranted('edit', $quiz);
+
         // Crée un nouvel objet permettant de paramétrer le formulaire
         $form = $this->createForm(QuizType::class, $quiz);
 
@@ -206,6 +210,10 @@ class QuizController extends AbstractController
      */
     public function update(Quiz $quiz, Request $request, EntityManagerInterface $manager)
     {
+        // Appelle le Voter pour déterminer si l'utilisateur actuellement connecté
+        // a le droit de modifier le quiz concerné
+        $this->denyAccessUnlessGranted('edit', $quiz);
+
         // Crée un nouvel objet permettant de paramétrer le formulaire
         $form = $this->createForm(QuizType::class, $quiz);
 
@@ -241,6 +249,10 @@ class QuizController extends AbstractController
      */
     public function delete(Quiz $quiz, EntityManagerInterface $manager)
     {
+        // Appelle le Voter pour déterminer si l'utilisateur actuellement connecté
+        // a le droit de modifier le quiz concerné
+        $this->denyAccessUnlessGranted('edit', $quiz);
+
         // Supprime le quiz de la base de données
         $manager->remove($quiz);
         $manager->flush();
