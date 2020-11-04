@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mode création{% endblock %}
+
+{% block main %}
+    <div class="jumbotron">
+        <h1 class="display-4">Création</h1>
+        <p class="lead">Sur cette page, vous retrouvez l'ensemble des quiz que vous avez créés. Vous pouvez modifier ou supprimer des quiz déjà existants, et même en créer de nouveaux!</p>
+    </div>
+
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for quiz in quizzes %}
+                <tr>
+                    <th scope="row">{{ quiz.id }}</th>
+                    <td>{{ quiz.title }}</td>
+                    <td>{{ quiz.description }}</td>
+                </tr>
+            {% endfor %}
+            
+        </tbody>
+    </table>
+{% endblock %}
