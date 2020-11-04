@@ -160,7 +160,7 @@ class QuizController extends AbstractController
         $form->handleRequest($request);
         // Si le formulaire est valide
         if ($form->isSubmitted() && $form->isValid()) {
-            // Crée un nouveau quiz à partir des données du formulaires
+            // Crée un nouveau quiz à partir des données du formulaire
             $quiz = $form->getData();
             // Associe le quiz à l'utilisateur actuellement connecté
             $quiz
@@ -178,6 +178,54 @@ class QuizController extends AbstractController
             ]);
         }
 
+        // Redirige sur la page "création"
+        return $this->redirectToRoute('create');
+    }
+
+    /**
+     * @Route("/{id}/update", name="update_form", methods={"GET"}, requirements={"id"="\d+"})
+     */
+    public function updateForm(Quiz $quiz)
+    {
+        // Crée un nouvel objet permettant de paramétrer le formulaire
+        $form = $this->createForm(QuizType::class, $quiz);
+
+        // Renvoie une nouvelle vue contenant le formulaire
+        return $this->render('quiz/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/update", name="update", methods={"POST"}, requirements={"id"="\d+"})
+     */
+    public function update(Quiz $quiz, Request $request, EntityManagerInterface $manager)
+    {
+        // Crée un nouvel objet permettant de paramétrer le formulaire
+        $form = $this->createForm(QuizType::class, $quiz);
+
+        // Laisse l'objet gérer la requête
+        $form->handleRequest($request);
+        // Si le formulaire est valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Crée un nouveau quiz à partir des données du formulaire
+            $quiz = $form->getData();
+            // Associe le quiz à l'utilisateur actuellement connecté
+            $quiz
+                ->setAuthor($this->getUser()->getPlayer())
+            ;
+
+            // Envoie le quiz en base de données
+            $manager->persist($quiz);
+            $manager->flush();
+        // Sinon
+        } else {
+            // Renvoie une nouvelle vue contenant le formulaire
+            return $this->render('quiz/new.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+        
         // Redirige sur la page "création"
         return $this->redirectToRoute('create');
     }

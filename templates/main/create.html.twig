@@ -14,6 +14,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
+                <th scope="col">Modifier</th>
             </tr>
         </thead>
         <tbody>
@@ -23,6 +24,11 @@
                     <th scope="row">{{ quiz.id }}</th>
                     <td>{{ quiz.title }}</td>
                     <td>{{ quiz.description }}</td>
+                    <td>
+                        <a href="{{ path('quiz_update_form', {id: quiz.id}) }}" class="btn btn-outline-warning">
+                            Modifier
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
             
