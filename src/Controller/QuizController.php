@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -129,6 +130,7 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @IsGranted("ROLE_USER")
      * @Route("/new", name="new_form", methods={"GET"})
      */
     public function newForm()
@@ -146,6 +148,7 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @IsGranted("ROLE_USER")
      * @Route("/new", name="new", methods={"POST"})
      */
     public function new(Request $request, EntityManagerInterface $manager)
@@ -183,6 +186,7 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @IsGranted("ROLE_USER")
      * @Route("/{id}/update", name="update_form", methods={"GET"}, requirements={"id"="\d+"})
      */
     public function updateForm(Quiz $quiz)
@@ -197,6 +201,7 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @IsGranted("ROLE_USER")
      * @Route("/{id}/update", name="update", methods={"POST"}, requirements={"id"="\d+"})
      */
     public function update(Quiz $quiz, Request $request, EntityManagerInterface $manager)
@@ -226,6 +231,20 @@ class QuizController extends AbstractController
             ]);
         }
         
+        // Redirige sur la page "création"
+        return $this->redirectToRoute('create');
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/{id}/delete", name="delete", methods={"POST"}, requirements={"id"="\d+"})
+     */
+    public function delete(Quiz $quiz, EntityManagerInterface $manager)
+    {
+        // Supprime le quiz de la base de données
+        $manager->remove($quiz);
+        $manager->flush();
+
         // Redirige sur la page "création"
         return $this->redirectToRoute('create');
     }

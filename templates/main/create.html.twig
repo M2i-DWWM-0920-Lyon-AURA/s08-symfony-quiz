@@ -15,6 +15,7 @@
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Modifier</th>
+                <th scope="col">Supprimer</th>
             </tr>
         </thead>
         <tbody>
@@ -28,6 +29,13 @@
                         <a href="{{ path('quiz_update_form', {id: quiz.id}) }}" class="btn btn-outline-warning">
                             Modifier
                         </a>
+                    </td>
+                    <td>
+                        <form method="post" action="{{ path('quiz_delete', {id: quiz.id}) }}">
+                            <button type="submit" class="btn btn-outline-danger">
+                                Supprimer
+                            </button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
