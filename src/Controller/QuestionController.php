@@ -2,19 +2,27 @@
 
 namespace App\Controller;
 
+use App\Entity\Quiz;
+use App\Entity\Question;
+use App\Form\QuestionType;
 use App\Repository\QuestionRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+/**
+ * @Route("/question", name="question_")
+ */
 class QuestionController extends AbstractController
 {
     /**
      * Display a single question for the user to answer
      * 
-     * @Route("/question/{id}", name="question_single", requirements={"id"="\d+"})
+     * @Route("/{id}", name="single", requirements={"id"="\d+"})
      */
     public function single(int $id, QuestionRepository $repository, SessionInterface $session): Response
     {
@@ -40,7 +48,7 @@ class QuestionController extends AbstractController
     /**
      * Process answer given by user to previous question
      * 
-     * @Route("/question/{id}/give-answer", name="question_give-answer", requirements={"id"="\d+"}, methods={"POST"})
+     * @Route("/{id}/give-answer", name="give-answer", requirements={"id"="\d+"}, methods={"POST"})
      */
     public function giveAnswer(int $id, Request $request, QuestionRepository $repository, SessionInterface $session)
     {
@@ -93,5 +101,122 @@ class QuestionController extends AbstractController
         return $this->redirectToRoute('question_single', [
             'id' => $nextQuestion->getId()
         ]);
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/new/{id}", name="new_form", methods={"GET"}, requirements={"id"="\d+"})
+     */
+    public function newForm(Quiz $quiz)
+    {
+        $this->denyAccessUnlessGranted('edit', $quiz);
+
+        // Crée une nouvelle question à injecter dans le formulaire
+        $question = new Question();
+
+        // Crée un nouvel objet permettant de paramétrer le formulaire
+        $form = $this->createForm(QuestionType::class, $question);
+
+        // Renvoie une nouvelle vue contenant le formulaire
+        return $this->render('question/edit.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/new/{id}", name="new", methods={"POST"}, requirements={"id"="\d+"})
+     */
+    public function new(Quiz $quiz, Request $request, EntityManagerInterface $manager)
+    {
+        $this->denyAccessUnlessGranted('edit', $quiz);
+
+        $question = new Question();
+
+        $form = $this->createForm(QuestionType::class, $question);
+
+        // Laisse l'objet gérer la requête
+        $form->handleRequest($request);
+        // Si le formulaire est valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            $question = $form->getData();
+
+            $question
+                ->set_rank( count($quiz->getQuestions()) + 1 )
+                ->setQuiz($quiz)
+            ;
+
+            $manager->persist($question);
+            $manager->flush();
+        } else {
+            // Renvoie une nouvelle vue contenant le formulaire
+            return $this->render('question/edit.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+        // Redirige sur la page "création"
+        return $this->redirectToRoute('quiz_update_form', [ 'id' => $quiz->getId() ]);
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/update/{id}", name="update_form", methods={"GET"}, requirements={"id"="\d+"})
+     */
+    public function updateForm(Question $question)
+    {
+        $this->denyAccessUnlessGranted('edit', $question->getQuiz());
+
+        // Crée un nouvel objet permettant de paramétrer le formulaire
+        $form = $this->createForm(QuestionType::class, $question);
+
+        // Renvoie une nouvelle vue contenant le formulaire
+        return $this->render('question/edit.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/update/{id}", name="update", methods={"POST"}, requirements={"id"="\d+"})
+     */
+    public function update(Question $question, Request $request, EntityManagerInterface $manager)
+    {
+        $this->denyAccessUnlessGranted('edit', $question->getQuiz());
+
+        $form = $this->createForm(QuestionType::class, $question);
+
+        // Laisse l'objet gérer la requête
+        $form->handleRequest($request);
+        // Si le formulaire est valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            $question = $form->getData();
+
+            $manager->persist($question);
+            $manager->flush();
+        } else {
+            // Renvoie une nouvelle vue contenant le formulaire
+            return $this->render('question/edit.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+        // Redirige sur la page "création"
+        return $this->redirectToRoute('quiz_update_form', [ 'id' => $question->getQuiz()->getId() ]);
+    }
+
+    /**
+     * @IsGranted("ROLE_USER")
+     * @Route("/{id}/delete", name="delete", methods={"POST"}, requirements={"id"="\d+"})
+     */
+    public function delete(Question $question, EntityManagerInterface $manager)
+    {
+        $this->denyAccessUnlessGranted('edit', $question->getQuiz());
+
+        $manager->remove($question);
+        $manager->flush();
+
+        // Redirige sur la page "création"
+        return $this->redirectToRoute('quiz_update_form', [ 'id' => $question->getQuiz()->getId() ]);
     }
 }

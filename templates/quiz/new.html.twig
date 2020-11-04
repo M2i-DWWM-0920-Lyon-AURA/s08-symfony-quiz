@@ -4,4 +4,29 @@
 
 {% block main %}
     {{ form(form) }}
+
+    {% if quiz.id %}
+        <ul class="list-group list-unstyled">
+
+            {% for question in quiz.questions %}
+            <a href="{{ path('question_update_form', {id: question.id}) }}" class="list-group-item list-group-item-action">
+                <li class="d-flex justify-content-between">
+                    <div>
+                        <strong>Question {{ question._rank }}:</strong> {{ question.description }}
+                    </div>
+                    <form method="post" action="{{ path('question_delete', {id: question.id}) }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            Supprimer
+                        </button>
+                    </form>
+                </li>
+            </a>
+            {% endfor %}
+
+        </ul>
+
+        <a href="{{ path('question_new_form', {id: quiz.id}) }}" class="btn btn-primary">
+            Nouvelle question
+        </a>
+    {% endif %}
 {% endblock %}

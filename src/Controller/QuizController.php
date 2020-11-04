@@ -144,6 +144,7 @@ class QuizController extends AbstractController
         // Renvoie une nouvelle vue contenant le formulaire
         return $this->render('quiz/new.html.twig', [
             'form' => $form->createView(),
+            'quiz' => $quiz,
         ]);
     }
 
@@ -201,6 +202,7 @@ class QuizController extends AbstractController
         // Renvoie une nouvelle vue contenant le formulaire
         return $this->render('quiz/new.html.twig', [
             'form' => $form->createView(),
+            'quiz' => $quiz,
         ]);
     }
 
