@@ -150,21 +150,35 @@ class QuizController extends AbstractController
      */
     public function new(Request $request, EntityManagerInterface $manager)
     {
+        // Crée un nouveau quiz à injecter dans le formulaire
         $quiz = new Quiz();
 
+        // Crée un nouvel objet permettant de paramétrer le formulaire
         $form = $this->createForm(QuizType::class, $quiz);
 
+        // Laisse l'objet gérer la requête
         $form->handleRequest($request);
+        // Si le formulaire est valide
         if ($form->isSubmitted() && $form->isValid()) {
+            // Crée un nouveau quiz à partir des données du formulaires
             $quiz = $form->getData();
+            // Associe le quiz à l'utilisateur actuellement connecté
             $quiz
                 ->setAuthor($this->getUser()->getPlayer())
             ;
         
+            // Envoie le quiz en base de données
             $manager->persist($quiz);
             $manager->flush();
+        // Sinon
+        } else {
+            // Renvoie une nouvelle vue contenant le formulaire
+            return $this->render('quiz/new.html.twig', [
+                'form' => $form->createView(),
+            ]);
         }
 
+        // Redirige sur la page "création"
         return $this->redirectToRoute('create');
     }
 }
